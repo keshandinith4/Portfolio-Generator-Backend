@@ -1,24 +1,9 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-
-    username: { 
-        type: String, 
-        required: true, 
-        unique: true,
-        trim: true 
-    },
-    email: { 
-        type: String, 
-        required: true, 
-        unique: true,
-        lowercase: true 
-    },
-    password: { 
-        type: String, 
-        required: true 
-    },
-
+    username: { type: String, required: true, unique: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true },
     portfolioData: {
         fullName: { type: String, default: "" },
         title: { type: String, default: "" },
@@ -29,29 +14,21 @@ const UserSchema = new mongoose.Schema({
             github: { type: String, default: "" }
         },
         skills: { type: [String], default: [] },
-        projects: [
-            {
-                name: { type: String },
-                description: { type: String },
-                techStack: { type: String },
-                githubLink: { type: String },
-                liveDemo: { type: String }
-            }
-        ],
-        experience: [
-            {
-                company: { type: String },
-                role: { type: String },
-                duration: { type: String },
-                description: { type: String }
-            }
-        ]
+        projects: [{
+            name: String,
+            description: String,
+            techStack: String,
+            githubLink: String,
+            liveDemo: String
+        }],
+        experience: [{
+            company: String,
+            role: String,
+            duration: String,
+            description: String
+        }]
     },
-    
-    hasPortfolio: { 
-        type: Boolean, 
-        default: false 
-    }
+    hasPortfolio: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);
