@@ -1,10 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const { update_portfolio, get_portfolio } = require('../controllers/portfolio_controller');
-const { verifyToken } = require('../middleware/verifyToken'); 
+const router = require('express').Router();
+const { updatePortfolio, getPortfolio } = require('../controllers/portfolio_controller');
+const { verifyToken } = require('../middleware/verify_token');
 
-router.put('/update', verifyToken, update_portfolio);
-
-router.get('/:username', get_portfolio);
+router.put('/update', verifyToken, updatePortfolio);
+router.get('/:username', getPortfolio);
 
 module.exports = router;
