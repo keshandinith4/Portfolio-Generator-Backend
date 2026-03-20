@@ -1,8 +1,22 @@
-const router = require('express').Router();
-const { updatePortfolio, getPortfolio } = require('../controllers/portfolio_controller');
-const { verifyToken } = require('../middleware/verify_token');
+const express = require('express');
+const router = express.Router();
 
-router.put('/update', verifyToken, updatePortfolio);
-router.get('/:username', getPortfolio);
+// get the controller functions
+router.get('/', async (req, res) => {
+    try {
+        res.json({ message: "Successfully fetched portfolio data" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Placeholder for future portfolio routes
+router.post('/add', async (req, res) => {
+    try {
+        res.status(201).json({ message: "Successfully added new portfolio" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;
