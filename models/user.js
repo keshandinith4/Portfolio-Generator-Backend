@@ -1,34 +1,65 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true },
+    username: { 
+        type: String, 
+        required: true, 
+        unique: true, 
+        trim: true,
+        lowercase: true 
+    },
+    email: { 
+        type: String, 
+        required: true, 
+        unique: true, 
+        lowercase: true,
+        trim: true 
+    },
+    password: { 
+        type: String, 
+        required: true 
+    },
+    // Main portfolio data structure
     portfolioData: {
         fullName: { type: String, default: "" },
         title: { type: String, default: "" },
+        profileImage: { type: String, default: "" }, // Personal Info
         bio: { type: String, default: "" },
         contact: {
             email: { type: String, default: "" },
             linkedin: { type: String, default: "" },
-            github: { type: String, default: "" }
+            github: { type: String, default: "" },
+            website: { type: String, default: "" } // Contact Section
         },
-        skills: { type: [String], default: [] },
+        skills: { 
+            type: [String], 
+            default: [] // Dynamic array for add/remove skills
+        },
         projects: [{
-            name: String,
-            description: String,
-            techStack: String,
-            githubLink: String,
-            liveDemo: String
+            name: { type: String, required: true },
+            description: { type: String },
+            techStack: { type: String },
+            githubLink: { type: String, default: "" },
+            liveDemo: { type: String, default: "" }
         }],
         experience: [{
-            company: String,
-            role: String,
-            duration: String,
-            description: String
+            company: { type: String },
+            role: { type: String },
+            duration: { type: String },
+            description: { type: String }
         }]
     },
-    hasPortfolio: { type: Boolean, default: false }
-}, { timestamps: true });
+    hasPortfolio: { 
+        type: Boolean, 
+        default: false 
+    },
+    viewCount: {
+        type: Number,
+        default: 0
+    }
+}, { 
+    timestamps: true 
+});
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
+export default User;

@@ -1,24 +1,65 @@
-const User = require('../models/User');
+import User from '../models/user.js';
 
-exports.updatePortfolio = async (req, res) => {
+// Update or Create Portfolio
+const updatePortfolio = async (req, res) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(
-            req.user.id,
-            { $set: { portfolioData: req.body, hasPortfolio: true } },
+            req.user.id, 
+            { 
+                $set: { 
+                    portfolioData: req.body, 
+                    hasPortfolio: true 
+                } 
+            },
             { new: true, runValidators: true }
-        );
-        res.status(200).json({ message: "Success", portfolioData: updatedUser.portfolioData });
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ 
+            message: "Portfolio updated successfully!", 
+            portfolioData: updatedUser.portfolioData 
+        });
+    } catch (err) {
+        // Validation errors
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Get Portfolio by Username
+const getPortfolio = async (req, res) => {
+    try {
+        // search by username and return portfolioData
+        const user = await User.findOne({ username: req.params.username })
+            .select('portfolioData fullName username'); 
+
+        if (!user || !user.portfolioData) {
+            return res.status(404).json({ message: "Portfolio not found!" });
+        }
+
+        res.status(200).json({
+            message: "Portfolio fetched successfully!",
+            portfolioData: user.portfolioData,
+            username: user.username
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-exports.getPortfolio = async (req, res) => {
+// Delete Portfolio
+const deletePortfolio = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username }).select('portfolioData');
-        if (!user) return res.status(404).json("Portfolio not found");
-        res.status(200).json(user.portfolioData);
+        await User.findByIdAndUpdate(req.user.id, {
+            $set: { hasPortfolio: false },
+            $unset: { portfolioData: "" }
+        });
+        res.status(200).json({ message: "Portfolio deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
+
+export { updatePortfolio, getPortfolio, deletePortfolio };
