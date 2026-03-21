@@ -1,23 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { register, login } from '../controllers/auth_controller.js';
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 
-router.post('/register', async (req, res) => {
-    try {
-        res.status(201).json({ message: "User registered successfully" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.post('/register', register);
 
-router.post('/login', async (req, res) => {
-    try {
-        res.status(200).json({ message: "Login successful" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.post('/login', login);
 
-module.exports = router;
+
+export default router;
