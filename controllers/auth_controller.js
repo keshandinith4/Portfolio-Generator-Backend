@@ -2,24 +2,19 @@ import User from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-//check username availability
+// check username availability
 const checkUsername = async (req, res) => {
     try {
         const { username } = req.query;
-
         if (!username || username.length < 3) {
             return res.status(400).json({ message: "Username too short!" });
         }
-
-        // Only allow letters, numbers
         const isValid = /^[a-zA-Z0-9]+$/.test(username);
         if (!isValid) {
             return res.status(400).json({ message: "Invalid characters in username!" });
         }
-
         const existing = await User.findOne({ username: username.toLowerCase() });
         res.status(200).json({ available: !existing });
-
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -28,32 +23,23 @@ const checkUsername = async (req, res) => {
 const register = async (req, res) => {
     try {
         const { firstName, lastName, username, email, password } = req.body;
-
         if (!firstName || !lastName || !username || !email || !password) {
             return res.status(400).json({ message: "All fields are required!" });
         }
-
-        // Validate username format
         const isValidUsername = /^[a-zA-Z0-9]+$/.test(username);
         if (!isValidUsername) {
             return res.status(400).json({ message: "Username can only contain letters and numbers!" });
         }
-
-        // Check username taken
         const existingUsername = await User.findOne({ username: username.toLowerCase() });
         if (existingUsername) {
             return res.status(400).json({ message: "Username already taken!" });
         }
-
-        // Check email taken
         const existingEmail = await User.findOne({ email });
         if (existingEmail) {
             return res.status(400).json({ message: "Email already registered!" });
         }
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
         const newUser = new User({
             username: username.toLowerCase(),
             email,
@@ -63,19 +49,14 @@ const register = async (req, res) => {
                 fullName: `${firstName} ${lastName}`,  
             }
         });
-
         const savedUser = await newUser.save();
-
         const token = jwt.sign(
             { id: savedUser._id, username: savedUser.username },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
-
         const { password: _, ...userInfo } = savedUser.toObject();
-
         res.status(201).json({ ...userInfo, token });
-
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -84,11 +65,9 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required!" });
         }
-
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "User not found!" });
 
@@ -100,14 +79,18 @@ const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
-
         const { password: _, ...userInfo } = user.toObject();
-
         res.status(200).json({ ...userInfo, token });
-
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}; 
+const logout = async (req, res) => {
+    try {
+        res.status(200).json({ message: "Logged out successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-export { checkUsername, register, login };
+export { checkUsername, register, login, logout };
