@@ -1,64 +1,121 @@
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
-    username: { 
-        type: String, 
-        required: true, 
-        unique: true, 
+    username: {
+        type: String,
+        required: true,
+        unique: true,
         trim: true,
-        lowercase: true 
+        lowercase: true
     },
-    email: { 
-        type: String, 
-        required: true, 
-        unique: true, 
-        lowercase: true,
-        trim: true 
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true
     },
-    password: { 
-        type: String, 
-        required: true 
+    password: {
+        type: String,
+        required: true
     },
-    // Main portfolio data structure
+
     portfolioData: {
-        fullName: { type: String, default: "" },
-        title: { type: String, default: "" },
-        profileImage: { type: String, default: "" }, // Personal Info
-        bio: { type: String, default: "" },
+        // Personal Info 
+        fullName: {
+            type: String,
+            default: ""
+        },
+        title: {
+            type: String,
+            default: ""         
+        },
+        bio: {
+            type: String,
+            default: ""
+        },
+        profileImage: {
+            type: String,
+            default: ""         
+        },
+        resumeUrl: {
+            type: String,       
+            default: ""
+        },
+
+        // Contact & Links 
         contact: {
-            email: { type: String, default: "" },
+            email:    { type: String, default: "" },
             linkedin: { type: String, default: "" },
-            github: { type: String, default: "" },
-            website: { type: String, default: "" } // Contact Section
+            github:   { type: String, default: "" },
+            website:  { type: String, default: "" }
         },
-        skills: { 
-            type: [String], 
-            default: [] // Dynamic array for add/remove skills
+
+        // Skills
+        skills: {
+            type: [String],
+            default: []         
         },
+
+        // Projects / Works 
         projects: [{
-            name: { type: String, required: true },
-            description: { type: String },
-            techStack: { type: String },
-            githubLink: { type: String, default: "" },
-            liveDemo: { type: String, default: "" }
+            name: {
+                type: String,
+                required: true
+            },
+            description: {
+                type: String,
+                default: ""
+            },
+            toolsUsed: {       
+                type: String,
+                default: ""   
+            },
+            projectLink: {     
+                type: String,
+                default: ""     // e.g. Behance, Dribbble, GitHub, or any source link
+            },
+            liveDemo: {
+                type: String,
+                default: ""
+            }
         }],
+
+        // Experience
         experience: [{
-            company: { type: String },
-            role: { type: String },
-            duration: { type: String },
-            description: { type: String }
+            company: {
+                type: String,
+                default: ""     // company, client, or organization
+            },
+            role: {
+                type: String,
+                default: ""
+            },
+            duration: {
+                type: String,
+                default: ""     // e.g. "Jan 2022 – Present"
+            },
+            description: {
+                type: String,
+                default: ""
+            }
         }]
     },
-    hasPortfolio: { 
-        type: Boolean, 
-        default: false 
+
+    // Portfolio Status 
+    hasPortfolio: {
+        type: Boolean,
+        default: false
     },
+
+    // Analytics
     viewCount: {
         type: Number,
         default: 0
     }
-}, { 
-    timestamps: true 
+
+}, {
+    timestamps: true  
 });
 
 const User = mongoose.model('User', UserSchema);

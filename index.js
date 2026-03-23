@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import authRoutes from './routes/auth_routes.js';
-import portfolioRoutes from './routes/portfolio_routes.js';
+import router from './routes/auth_routes.js';
+import Portfoliorouter from './routes/portfolio_routes.js';
 
 dotenv.config();
 
@@ -13,8 +13,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/auth', router);
+app.use('/api/portfolio', Portfoliorouter);
 
 const MONGO_URL = process.env.MONGO_URL;
 const PORT = process.env.PORT || 5000;

@@ -1,17 +1,12 @@
 import express from 'express';
-import { getPortfolio } from '../controllers/portfolio_controller.js';
-const router = express.Router();
+import { createPortfolio, updatePortfolio, getPortfolio, incrementViewCount, deletePortfolio } from '../controllers/portfolio_controller.js';
 
-// get the controller functions
-router.get('/:username', getPortfolio);
+const Portfoliorouter = express.Router();
 
-// Placeholder for future portfolio routes
-router.post('/add', async (req, res) => {
-    try {
-        res.status(201).json({ message: "Successfully added new portfolio" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+Portfoliorouter.post('/create', createPortfolio);
+Portfoliorouter.put('/:username', updatePortfolio);
+Portfoliorouter.get('/:username', getPortfolio);
+Portfoliorouter.post('/:username/view', incrementViewCount);
+Portfoliorouter.delete('/:username', deletePortfolio);
 
-export default router;
+export default Portfoliorouter;

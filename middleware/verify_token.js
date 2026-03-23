@@ -1,34 +1,30 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-// check if the request has a valid token
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.authorization || req.headers.token;
-    
-    if (authHeader) {
-        const token = authHeader.split(" ")[1];
-        
-        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-            if (err) return res.status(403).json("Token is not valid!");
-            
-            req.user = user;
-            next();
-        });
-    } else {
-        return res.status(401).json("You are not authenticated!");
+export const verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Access denied! No token provided." });
     }
-};
 
-const verifyTokenAndAuthorization = (req, res, next) => {
-    verifyToken(req, res, () => {
-        if (req.user.username === req.params.username || req.user.id) {
-            next();
-        } else {
-            res.status(403).json("You are not allowed to do that!");
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            const message = err.name === 'TokenExpiredError' ? "Session expired!" : "Invalid token!";
+            return res.status(403).json({ message });
         }
+        req.user = decoded; 
+        next();
     });
 };
 
-module.exports = { 
-    verifyToken, 
-    verifyTokenAndAuthorization 
+export const verifyTokenAndAuthorization = (req, res, next) => {
+    verifyToken(req, res, () => {
+        // Only allow if the logged-in user matches the username in params OR is an admin
+        if (req.user.username === req.params.username || req.user.isAdmin) {
+            next();
+        } else {
+            res.status(403).json({ message: "You are not authorized to edit this portfolio!" });
+        }
+    });
 };
