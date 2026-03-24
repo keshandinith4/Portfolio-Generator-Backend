@@ -3,43 +3,45 @@ import User from '../models/user.js';
 // POST /portfolio/add 
 const createPortfolio = async (req, res) => {
     try {
-        const username = req.params.username|| req.user?.params.username.toLowerCase(); 
-        const user = await User.findOne({ username: username });
-        console.log("Found user:", user);          // 👈 add
-        console.log("req.body:", JSON.stringify(req.body, null, 2)); // 👈 add
+        const username = req.params.username;
 
         if (req.user.username !== username) {
             return res.status(403).json({ message: "You can only create your own portfolio!" });
         }
 
+        const user = await User.findOne({ username });
         if (!user) return res.status(404).json({ message: "User not found!" });
 
         if (user.hasPortfolio) {
             return res.status(400).json({ message: "Portfolio already exists!" });
         }
 
-        user.portfolioData = buildPortfolioData(req.body);
-        user.hasPortfolio  = true;
+        const updatedUser = await User.findOneAndUpdate(
+            { username },
+            { $set: { portfolioData: buildPortfolioData(req.body), hasPortfolio: true } },
+            { new: true }
+        ).select('-password');
 
-        const saved = await User.updateOne({username: username}, { $set: { portfolioData: user.portfolioData, hasPortfolio: true } });
-        console.log("Saved:", saved._id);               // 👈 add
-
-        const { password, ...userInfo } = user.toObject();
-        res.status(201).json({ message: "Portfolio created successfully!", user: userInfo });
+        res.status(200).json({ message: "Portfolio created successfully!", user: updatedUser });
 
     } catch (err) {
-        console.error("CREATE ERROR NAME:", err.name);     // 👈 add
-        console.error("CREATE ERROR MSG:", err.message);   // 👈 add
-        console.error("CREATE ERROR:", err);               // 👈 add
         res.status(500).json({ error: err.message });
     }
 };
 // PUT /portfolio/update/:username 
 const updatePortfolio = async (req, res) => {
     try {
-        // Users can only update their own portfolio
-        if (req.user.username !== req.params.username) {
+        const username = req.params.username;
+
+        if (req.user.username !== username) {
             return res.status(403).json({ message: "You can only update your own portfolio!" });
+        }
+
+        const user = await User.findOne({ username });
+        if (!user) return res.status(404).json({ message: "User not found!" });
+
+        if (!user.hasPortfolio) {
+            return res.status(400).json({ message: "Portfolio does not exist! Create one first." });
         }
 
         const { fullName, title } = req.body;
@@ -47,13 +49,11 @@ const updatePortfolio = async (req, res) => {
             return res.status(400).json({ message: "Full name and title are required!" });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            req.user._id,
-            { $set: { portfolioData: buildPortfolioData(req.body), hasPortfolio: true } },
-            { new: true, runValidators: true }
+        const updatedUser = await User.findOneAndUpdate(
+            { username },
+            { $set: { portfolioData: buildPortfolioData(req.body) } },
+            { new: true }
         ).select('-password');
-
-        if (!updatedUser) return res.status(404).json({ message: "User not found!" });
 
         res.status(200).json({ message: "Portfolio updated successfully!", user: updatedUser });
 
