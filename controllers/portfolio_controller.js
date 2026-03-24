@@ -100,7 +100,7 @@ const incrementViewCount = async (req, res) => {
 // Delete portfolio
 const deletePortfolio = async (req, res) => {
     try {
-        const user = await User.findOneAndUpdate( 
+        const user = await User.findOneAndDelete( 
             { username: req.user.username },       
             {
                 $set:   { hasPortfolio: false },
