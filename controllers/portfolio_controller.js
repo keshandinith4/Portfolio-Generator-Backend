@@ -100,11 +100,11 @@ const incrementViewCount = async (req, res) => {
 // Delete portfolio
 const deletePortfolio = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(
-            req.user.id,
+        const user = await User.findOneAndUpdate( 
+            { username: req.user.username },       
             {
                 $set:   { hasPortfolio: false },
-                $unset: { portfolioData: ""   }  
+                $unset: { portfolioData: ""   }
             },
             { new: true }
         ).select('-password');
